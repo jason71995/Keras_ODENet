@@ -12,13 +12,13 @@ def set_gpu_config(device = "0",fraction=0.25):
     K.set_session(tf.Session(config=config))
 
 class ODEBlock(Model):
-    def __init__(self, filters, kernel_size, name=None):
+    def __init__(self, filters, kernel_size):
 
         x = Input((None,None,filters))
         y = Conv2D(filters,kernel_size,padding="same",activation="relu")(x)
         y = Conv2D(filters,kernel_size,padding="same",activation="relu")(y)
 
-        super(ODEBlock, self).__init__(x, y, name)
+        super(ODEBlock, self).__init__(x, y)
 
     def call(self,x):
         t = K.variable([0,1],dtype="float32")
