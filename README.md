@@ -8,6 +8,14 @@ Implementation of [(2018) Neural Ordinary Differential Equations](https://arxiv.
 
 ODE solver are use [tf.contrib.integrate.odeint](https://www.tensorflow.org/api_docs/python/tf/contrib/integrate/odeint) which only supported "dopri5" method now.
 
+## Environment
+
+```
+python==3.6
+tensorflow==1.4.0
+keras==2.1.0
+```
+
 ## Result
 
 Result on 10 epochs
