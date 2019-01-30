@@ -21,7 +21,7 @@ class ODEBlock(Model):
         super(ODEBlock, self).__init__(x, y)
 
     def call(self,x):
-        t = K.variable([0,1],dtype="float32")
+        t = K.constant([0,1],dtype="float32")
         return tf.contrib.integrate.odeint(self.ode_func, x, t, rtol=1e-3, atol=1e-3)[1]
 
     def ode_func(self,x,t):
