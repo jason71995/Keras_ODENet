@@ -21,7 +21,7 @@ keras==2.1.0
 Result on 10 epochs
 
 ### MNIST ODENet
-train_loss: 0.0107 - train_acc: 0.9965 - val_loss: 0.0295 - val_acc: 0.9929
+train_loss: 0.0112 - train_acc: 0.9962 - val_loss: 0.0234 - val_acc: 0.9929
 
 ### MNIST ResNet
 train_loss: 0.0096 - train_acc: 0.9968 - val_loss: 0.0307 - val_acc: 0.9908

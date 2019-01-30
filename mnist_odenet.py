@@ -3,7 +3,7 @@ import keras.backend as K
 import keras
 from keras.datasets import mnist
 from keras.models import Model
-from keras.layers import Conv2D, Dense, Flatten, Input, MaxPooling2D
+from keras.layers import Conv2D, Dense, Flatten, Input, MaxPooling2D, Lambda, Layer
 
 def set_gpu_config(device = "0",fraction=0.25):
     config = tf.ConfigProto()
@@ -11,20 +11,28 @@ def set_gpu_config(device = "0",fraction=0.25):
     config.gpu_options.visible_device_list = device
     K.set_session(tf.Session(config=config))
 
+
 class ODEBlock(Model):
     def __init__(self, filters, kernel_size):
+        self.t = K.constant([0],dtype="float32")
 
         x = Input((None,None,filters))
-        y = Conv2D(filters,kernel_size,padding="same",activation="relu")(x)
+        y = Lambda(self.concat_t)(x)
         y = Conv2D(filters,kernel_size,padding="same",activation="relu")(y)
-
+        y = Lambda(self.concat_t)(y)
+        y = Conv2D(filters,kernel_size,padding="same",activation="relu")(y)
         super(ODEBlock, self).__init__(x, y)
 
-    def call(self,x):
-        t = K.constant([0,1],dtype="float32")
-        return tf.contrib.integrate.odeint(self.ode_func, x, t, rtol=1e-3, atol=1e-3)[1]
+    def concat_t(self,x):
+        new_shape = tf.concat([tf.shape(x)[:-1], tf.ones((1,), "int32")], axis=0)
+        t = tf.ones(shape=new_shape) * tf.reshape(self.t, (1, 1, 1, 1))
+        return tf.concat([x, t], axis=-1)
 
-    def ode_func(self,x,t):
+    def call(self, x):
+        return tf.contrib.integrate.odeint(self.ode_func, x, K.constant([0, 1],dtype="float32"), rtol=1e-3, atol=1e-3)[1]
+
+    def ode_func(self, x, t):
+        self.t = t
         return super(ODEBlock, self).call(x)
 
 
