@@ -3,7 +3,7 @@ import keras.backend as K
 import keras
 from keras.datasets import mnist
 from keras.models import Model
-from keras.layers import Conv2D, Dense, Flatten, Input, Add, MaxPooling2D
+from keras.layers import Conv2D, Dense, Flatten, Input, MaxPooling2D, Layer
 
 def set_gpu_config(device = "0",fraction=0.25):
     config = tf.ConfigProto()
@@ -11,15 +11,36 @@ def set_gpu_config(device = "0",fraction=0.25):
     config.gpu_options.visible_device_list = device
     K.set_session(tf.Session(config=config))
 
-class ResBlock(Model):
-    def __init__(self, filters, kernel_size):
 
-        x = Input((None,None,filters))
-        y = Conv2D(filters,kernel_size,padding="same",activation="relu")(x)
-        y = Conv2D(filters,kernel_size,padding="same",activation="relu")(y)
-        y = Add()([y,x])
+class ResBlock(Layer):
 
-        super(ResBlock, self).__init__(x, y)
+    def __init__(self, filters, kernel_size, **kwargs):
+        self.filters = filters
+        self.kernel_size = kernel_size
+        super(ResBlock, self).__init__(**kwargs)
+
+    def build(self, input_shape):
+        self.conv2d_w1 = self.add_weight("conv2d_w1", self.kernel_size + (self.filters, self.filters), initializer='glorot_uniform')
+        self.conv2d_w2 = self.add_weight("conv2d_w2", self.kernel_size + (self.filters, self.filters), initializer='glorot_uniform')
+        self.conv2d_b1 = self.add_weight("conv2d_b1", (self.filters,), initializer='zero')
+        self.conv2d_b2 = self.add_weight("conv2d_b2", (self.filters,), initializer='zero')
+        super(ResBlock, self).build(input_shape)
+
+    def call(self, x):
+        y = K.conv2d(x, self.conv2d_w1, padding="same")
+        y = K.bias_add(y, self.conv2d_b1)
+        y = K.relu(y)
+
+        y = K.conv2d(y, self.conv2d_w2, padding="same")
+        y = K.bias_add(y, self.conv2d_b2)
+        y = K.relu(y)
+
+        y = y+x
+        return y
+
+    def compute_output_shape(self, input_shape):
+        return input_shape
+
 
 
 def build_model(input_shape, num_classes):
