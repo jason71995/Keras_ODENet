@@ -10,6 +10,7 @@ ODE solver are use [tf.contrib.integrate.odeint](https://www.tensorflow.org/api_
 
 ## Environment
 
+GPU: Nvidia GTX 670
 ```
 python==3.6
 tensorflow==1.4.0
@@ -21,8 +22,14 @@ keras==2.1.0
 Result on 10 epochs
 
 ### MNIST ODENet
+
+training time: 730s
+
 train_loss: 0.0112 - train_acc: 0.9962 - val_loss: 0.0234 - val_acc: 0.9929
 
 ### MNIST ResNet
+
+training time: 120s
+
 train_loss: 0.0096 - train_acc: 0.9968 - val_loss: 0.0307 - val_acc: 0.9908
 
